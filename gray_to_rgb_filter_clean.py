@@ -8,11 +8,11 @@ from gray_scale_to_rgb import gray_to_rgb_filter
 import matplotlib.pyplot as plt
 
 
-DEST_PATH = "GRAY_TO_RGB_FILTERED_IMAGES"
+DEST_PATH = "/home/umut/Desktop/IEEE_disaster_paper/filtered_imgs_for_scripts"
 
 os.makedirs(DEST_PATH, exist_ok=True)
 
-img_path = "imgs/flight2_frame10731.jpg"
+img_path = "/home/umut/Desktop/IEEE_disaster_paper/imgs_for_scripts/flight3_frame12831.jpg"
 
 img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
 

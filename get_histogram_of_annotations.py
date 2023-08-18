@@ -50,13 +50,27 @@ for (img_path, label_path) in zip(sorted(img_paths, key=lambda x : os.path.basen
     image_count += 1
 
 
-norm_sum_of_annotations_hist = sum_of_annotations_hist / np.sum(sum_of_annotations_hist)
-norm_sum_of_image_hist = sum_of_image_hist / np.sum(sum_of_image_hist)
+#get moving average with 5 neighbors for each point in array
+def moving_average(a, n=5):
+    ret = np.cumsum(a, dtype=float)
+    ret[n:] = ret[n:] - ret[:-n]
+    return ret[n-1:] / n
 
-print(annotation_count, image_count)
+sum_of_annotations_hist_clustered = moving_average(sum_of_annotations_hist, n=5)
+sum_of_image_hist_clustered = moving_average(sum_of_image_hist, n=5)
 
+
+
+norm_sum_of_annotations_hist = sum_of_annotations_hist_clustered / np.sum(sum_of_annotations_hist_clustered)
+norm_sum_of_image_hist = sum_of_image_hist_clustered / np.sum(sum_of_image_hist_clustered)
+
+print(f"image count: {image_count}, annotation count: {annotation_count}")
+print(f"median of annotations: {np.argmax(sum_of_annotations_hist)}, median of images: {np.argmax(sum_of_image_hist)}")
+print(f"std of annotations: {np.std(norm_sum_of_annotations_hist)}, std of images: {np.std(norm_sum_of_image_hist)}")
+
+
+    
 plt.plot(norm_sum_of_annotations_hist, color="red")
 plt.plot(norm_sum_of_image_hist, color="blue")
+plt.legend(["Annotations", "Images"])
 plt.show()
-    
-    
