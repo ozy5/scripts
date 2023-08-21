@@ -1,8 +1,8 @@
 import numpy as np
 
 
-blue_mapping_start_point = 200
-red_mapping_start_point = 160
+blue_mapping_start_point = 150
+red_mapping_start_point = 130
 
 blue_mapping_slope = (255/(255-blue_mapping_start_point))
 red_mapping_slope = (255/(255-red_mapping_start_point))

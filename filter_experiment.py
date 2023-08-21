@@ -12,14 +12,14 @@ from PIL import Image
 imgs_path = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset/test/images"
 
 
-DEST_PATH = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset_FILTER_APPLIED_MULTIPLE_LAYERS"
+DEST_PATH = "/home/umut/Desktop/thermal-disaster-dataset/200_180_filters_HIST_EQ_for_blue_and_red"
 
 os.makedirs(DEST_PATH, exist_ok=True)
 
-
+clahe = cv2.createCLAHE(clipLimit=2, tileGridSize=(4,4))
 
 blue_mapping_start_point = 200
-red_mapping_start_point = 160
+red_mapping_start_point = 180
 
 blue_mapping_slope = (255/(255-blue_mapping_start_point))
 red_mapping_slope = (255/(255-red_mapping_start_point))
@@ -47,21 +47,18 @@ for img_name in os.listdir(imgs_path):
 
     img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
 
-
+    
 
 
     start = time.time()
 
 
-
-
-
-
-
+    clahe = cv2.createCLAHE(clipLimit=2, tileGridSize=(4,4))
+    img_clahe = clahe.apply(img)
 
     # BASIC GLOBAL THRESHOLDING
-    blue_layer = (((img - blue_mapping_start_point)*blue_mapping_slope) * (img>blue_mapping_start_point)).astype(np.uint8)
-    red_layer = (((img - red_mapping_start_point)*red_mapping_slope) * (img>red_mapping_start_point)).astype(np.uint8)
+    blue_layer = (((img_clahe - blue_mapping_start_point)*blue_mapping_slope) * (img_clahe>blue_mapping_start_point)).astype(np.uint8)
+    red_layer = (((img_clahe - red_mapping_start_point)*red_mapping_slope) * (img_clahe>red_mapping_start_point)).astype(np.uint8)
     new_img = np.stack((blue_layer, img, red_layer), axis=2)
 
 
