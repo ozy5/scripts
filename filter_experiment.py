@@ -9,15 +9,17 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 
-DEST_PATH = "/home/umut/Desktop/IEEE_disaster_paper/filtered_imgs_for_scripts"
+imgs_path = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset/test/images"
+
+
+DEST_PATH = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset_FILTER_APPLIED_MULTIPLE_LAYERS"
 
 os.makedirs(DEST_PATH, exist_ok=True)
 
-imgs_path = "/home/umut/Desktop/IEEE_disaster_paper/imgs_for_scripts"
 
 
-blue_mapping_start_point = 130
-red_mapping_start_point = 100
+blue_mapping_start_point = 200
+red_mapping_start_point = 160
 
 blue_mapping_slope = (255/(255-blue_mapping_start_point))
 red_mapping_slope = (255/(255-red_mapping_start_point))
@@ -38,6 +40,10 @@ for img_name in os.listdir(imgs_path):
 
     # plt.plot(chist_arr)
     # plt.show()
+
+    print(img_path)
+
+    
 
     img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
 

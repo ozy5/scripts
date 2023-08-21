@@ -4,9 +4,9 @@ from PIL import Image, ImageOps
 import numpy as np
 import matplotlib.pyplot as plt
 
-DATASET_PATH = "/home/umut/Desktop/IEEE_disaster_paper/Training/nii_cu_dataset"
+DATASET_PATH = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_clean_final"
 
-SAVE_PATH = "/home/umut/Desktop/IEEE_disaster_paper/Training/cropped_try"
+SAVE_PATH = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_clean_final_cropped_annotations"
 os.makedirs(SAVE_PATH, exist_ok=True)
 
 img_paths = glob.glob(os.path.join(DATASET_PATH, "*", "images", "*"))

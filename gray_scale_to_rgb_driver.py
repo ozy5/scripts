@@ -5,10 +5,15 @@ from gray_scale_to_rgb import gray_to_rgb_filter
 import time
 from imageio import imwrite
 
-SOURCE_PATH = "DATASET_IMGS/nii_cu_dataset/val/images"
+SOURCE_PATH = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset/val/images"
+
+#previous_was_135_100
+DEST_PATH = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset_filtered/val/images"
 
 
-DEST_PATH = "DATASET_IMGS/nii_cu_dataset_filtered/val/images"
+#Filter to HIT_UAV_clean_final_filtered is 200 at blue, 160 at red channel
+
+#Filter to HIT_UAV_clean_final_filtered is 200 at blue, 160 at red channel
 
 os.makedirs(DEST_PATH, exist_ok=True)
 
