@@ -3,11 +3,11 @@ import shutil
 import glob
 import cv2
 from imageio import imwrite
-from gray_scale_to_rgb import gray_to_rgb_filter
+from gray_scale_to_rgb import gray_to_rgb_filter, gray_to_rgb_with_clahe
 
 SOURCE_DATASET_PATH = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset"
 
-DEST_DATASET_PATH = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset_filtered_170_150"
+DEST_DATASET_PATH = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset_filtered_200_175_hist_eq"
 
 
 for sub_folder_path in glob.glob(os.path.join(SOURCE_DATASET_PATH, "**", "**")):
@@ -33,7 +33,7 @@ for path in paths:
         img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
 
 
-        bgr_filtered_img = gray_to_rgb_filter(img)
+        bgr_filtered_img = gray_to_rgb_with_clahe(img)
 
 
         rgb_filtered_img = bgr_filtered_img[:, :, ::-1]

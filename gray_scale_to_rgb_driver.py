@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import cv2
-from gray_scale_to_rgb import gray_to_rgb_filter
+from gray_scale_to_rgb import gray_to_rgb_filter, gray_to_rgb_with_clahe
 import time
 from imageio import imwrite
 
@@ -32,7 +32,7 @@ for img_name in os.listdir(SOURCE_PATH):
 
     time_start = time.time()
 
-    bgr_filtered_img = gray_to_rgb_filter(img)
+    bgr_filtered_img = gray_to_rgb_with_clahe(img)
 
     passed_time += time.time() - time_start
 
