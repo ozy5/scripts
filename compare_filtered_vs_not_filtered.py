@@ -5,21 +5,20 @@ import glob
 from ultralytics import YOLO
 import cv2
 
-SAVE_PATH_ROOT = "/home/umut/AKONS/AKONS_TRAINING/testing/compare_v1_v2"
+SAVE_PATH_ROOT = "/home/umut/Desktop/THERMAL_DISASTER_VAL/test_for_thermal_disaster"
 
-images_filtered_root_path = "/home/umut/AKONS/AKONS_TRAINING/testing/one_img"
+images_filtered_root_path = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset_filtered_200_175_hist_eq/test/images"
 
-images_not_filtered_root_path = "/home/umut/AKONS/AKONS_TRAINING/testing/one_img"
+images_not_filtered_root_path = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset/test/images"
 
-weights_filtered_path = "/home/umut/AKONS/AKONS_TRAINING/testing/akons_train_small_256batch_mosaic_0.2.pt"
+weights_filtered_path = "/home/umut/Desktop/THERMAL_DISASTER_VAL/HIT_UAV_and_NII_CU_dataset_filtered_200_175_hist_eq.pt"
 
-weights_not_filtered_path = "/home/umut/AKONS/AKONS_TRAINING/testing/akons_v2.pt"
+weights_not_filtered_path = "/home/umut/Desktop/THERMAL_DISASTER_VAL/HIT_UAV_and_NII_CU_dataset.pt"
 
 # THE NUMBER -3 IS PATH SPECIFIC
-# weights_filtered_name = weights_filtered_path.split("/")[-3]
-# weights_not_filtered_name = weights_not_filtered_path.split("/")[-3]
-weights_filtered_name = "AKONS_v1"
-weights_not_filtered_name = "AKONS_v2"
+weights_filtered_name = weights_filtered_path.split("/")[-1]
+weights_not_filtered_name = weights_not_filtered_path.split("/")[-1]
+
 
 SAVE_PATH = os.path.join(SAVE_PATH_ROOT, weights_filtered_name + "_vs_" + weights_not_filtered_name)
 
@@ -29,7 +28,7 @@ os.makedirs(SAVE_PATH, exist_ok=True)
 
 CONF_THRES = 0.2
 IOU_THRES = 0.6
-LINE_THICKNESS = 2
+LINE_THICKNESS = 1
 
 
 model_filtered = YOLO(weights_filtered_path)
@@ -57,8 +56,8 @@ for (filtered_img, not_filtered_img) in zip(sorted(images_filtered, key=lambda x
     not_filtered_img_results = model_not_filtered(not_filtered_img)[0]
 
     #plot the bboxes
-    annotated_filtered_img = filtered_img_results.plot(line_width = LINE_THICKNESS, conf_thres=CONF_THRES, iou_thres=IOU_THRES, hide_labels=True)
-    annotated_not_filtered_img = not_filtered_img_results.plot(line_width = LINE_THICKNESS, conf_thres=CONF_THRES, iou_thres=IOU_THRES, hide_labels=True)
+    annotated_filtered_img = filtered_img_results.plot(line_width = LINE_THICKNESS, conf_thres=CONF_THRES, iou_thres=IOU_THRES, show_labels=False, hide_conf=True)
+    annotated_not_filtered_img = not_filtered_img_results.plot(line_width = LINE_THICKNESS, conf_thres=CONF_THRES, iou_thres=IOU_THRES, show_labels=False, hide_conf=True)
 
     # #add weights names as labels to upper-left corner of each annotated image
     annotated_filtered_img = cv2.putText(annotated_filtered_img, weights_filtered_name, (0, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
