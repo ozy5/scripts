@@ -2,35 +2,38 @@ import os
 import glob
 import utils.utils as utils
 import torch
+import numpy as np
 from ultralytics import YOLO
 import matplotlib.pyplot as plt
+from copy import deepcopy
 
 CONF_THRESHOLD = 0.2
 
 # IoU_threshold = 0.5
-IoU_thresholds = [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.63, 0.66, 0.69, 0.72, 0.75, 0.78, 0.81, 0.84, 0.87, 0.9, 0.93, 0.96]
+# IoU_thresholds = [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.63, 0.66, 0.69, 0.72, 0.75, 0.78, 0.81, 0.84, 0.87, 0.9, 0.93, 0.96]
+IoU_thresholds = [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.63, 0.66, 0.69, 0.72, 0.75]
+IoU_thresholds = list(np.linspace(0.1, 0.75, 20))
 # FOR FILTERED:
 #all images path
-FILTERED_IMAGES_PATH = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset_filtered_200_175_hist_eq/test/images"
+FILTERED_IMAGES_PATH = "/home/umut/Desktop/local_try_exp/HIT_UAV_and_NII_CU_dataset_filtered_200_175_hist_eq/test/images"
 
 #all labels path (labels must be in YOLO format and has the same name with the corresponding image)
-FILTERED_LABELS_PATH = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset_filtered_200_175_hist_eq/test/labels"
+FILTERED_LABELS_PATH = "/home/umut/Desktop/local_try_exp/HIT_UAV_and_NII_CU_dataset_filtered_200_175_hist_eq/test/labels"
 
 #YOLOv8 model path
-FILTERED_MODEL_PATH = "/home/umut/Desktop/THERMAL_DISASTER_VAL/HIT_UAV_and_NII_CU_dataset_filtered_200_175_hist_eq.pt"
+FILTERED_MODEL_PATH = "/home/umut/Desktop/local_try_exp/filtered_HIT_UAV/filtered_new_200_175_hist_eq/weights/best.pt"
 
 
 
 # FOR NOT_FILTERED:
 #all images path
-NOT_FILTERED_IMAGES_PATH = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset/test/images"
+NOT_FILTERED_IMAGES_PATH = "/home/umut/Desktop/local_try_exp/HIT_UAV_and_NII_CU_dataset_filtered/test/images"
 
 #all labels path (labels must be in YOLO format and has the same name with the corresponding image)
-NOT_FILTERED_LABELS_PATH = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset/test/labels"
+NOT_FILTERED_LABELS_PATH = "/home/umut/Desktop/local_try_exp/HIT_UAV_and_NII_CU_dataset_filtered/test/labels"
 
 #YOLOv8 model path
-NOT_FILTERED_MODEL_PATH = "/home/umut/Desktop/THERMAL_DISASTER_VAL/HIT_UAV_and_NII_CU_dataset.pt"
-
+NOT_FILTERED_MODEL_PATH = "/home/umut/Desktop/local_try_exp/filtered_HIT_UAV/filtered_new/weights/best.pt"
 
 
 #load the model
@@ -45,21 +48,37 @@ not_filtered_model_recalls = []
 not_filtered_model_precisions = []
 not_filtered_model_f1_scores = []
 
+#get the filtered results
+results_filtered = model_filtered.predict(FILTERED_IMAGES_PATH, verbose=False)
+
+# get prediction filtered results
+predictions_xyxy_normalized_filtered = [(result.boxes.xyxyn.to("cpu")) for result in results_filtered]
+
+#get label filtered paths
+label_paths_filtered = [os.path.join(FILTERED_LABELS_PATH, (os.path.splitext(os.path.basename(result.path))[0] + ".txt")) for result in results_filtered]
+
+
+
+#get the not filtered results
+results_not_filtered = model_not_filtered.predict(NOT_FILTERED_IMAGES_PATH, verbose=False)
+
+# get prediction not filtered results
+predictions_xyxy_normalized_not_filtered = [(result.boxes.xyxyn.to("cpu")) for result in results_not_filtered]
+
+#get label not filtered paths
+label_paths_not_filtered = [os.path.join(NOT_FILTERED_LABELS_PATH, (os.path.splitext(os.path.basename(result.path))[0] + ".txt")) for result in results_not_filtered]
+
+label_bboxes_filtered = [utils.get_xyxy_bboxes_from_YOLO_format_txt(label_path) for label_path in label_paths_filtered]
+label_bboxes_not_filtered = [utils.get_xyxy_bboxes_from_YOLO_format_txt(label_path) for label_path in label_paths_not_filtered]
+
+
 for IoU_threshold in IoU_thresholds:
+    print(label_bboxes_filtered[0])
 
     # # FILTERED PART:
 
-    #get the filtered results
-    results_filtered = model_filtered.predict(FILTERED_IMAGES_PATH, verbose=False)
-
-    # get prediction filtered results
-    predictions_xyxy_normalized_filtered = [(result.boxes.xyxyn.to("cpu")) for result in results_filtered]
-
-    #get label filtered paths
-    label_paths_filtered = [os.path.join(FILTERED_LABELS_PATH, (os.path.splitext(os.path.basename(result.path))[0] + ".txt")) for result in results_filtered]
-
     #calculate the TP, FP and FN for filtered images
-    TP_filtered, FP_filtered, FN_filtered = utils.calculate_TP_FP_FN_all_images(predictions_xyxy_normalized_filtered, label_paths_filtered, IoU_threshold=IoU_threshold)
+    TP_filtered, FP_filtered, FN_filtered = utils.calculate_TP_FP_FN_all_images(predictions_xyxy_normalized_filtered, label_bboxes_filtered, IoU_threshold=IoU_threshold)
 
     #calculate the recall and precision for filtered images
     recall_filtered, precision_filtered = utils.calculate_recall_and_precision_from_TP_FP_FN(TP_filtered, FP_filtered, FN_filtered)
@@ -71,17 +90,11 @@ for IoU_threshold in IoU_thresholds:
 
     # # NOT FILTERED PART:
 
-    #get the not filtered results
-    results_not_filtered = model_not_filtered.predict(NOT_FILTERED_IMAGES_PATH, verbose=False)
 
-    # get prediction not filtered results
-    predictions_xyxy_normalized_not_filtered = [(result.boxes.xyxyn.to("cpu")) for result in results_not_filtered]
 
-    #get label not filtered paths
-    label_paths_not_filtered = [os.path.join(NOT_FILTERED_LABELS_PATH, (os.path.splitext(os.path.basename(result.path))[0] + ".txt")) for result in results_not_filtered]
 
     #calculate the TP, FP and FN for not filtered images
-    TP_not_filtered, FP_not_filtered, FN_not_filtered = utils.calculate_TP_FP_FN_all_images(predictions_xyxy_normalized_not_filtered, label_paths_not_filtered, IoU_threshold=IoU_threshold)
+    TP_not_filtered, FP_not_filtered, FN_not_filtered = utils.calculate_TP_FP_FN_all_images(predictions_xyxy_normalized_not_filtered, label_bboxes_not_filtered, IoU_threshold=IoU_threshold)
 
     #calculate the recall and precision for not filtered images
     recall_not_filtered, precision_not_filtered = utils.calculate_recall_and_precision_from_TP_FP_FN(TP_not_filtered, FP_not_filtered, FN_not_filtered)

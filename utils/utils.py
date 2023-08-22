@@ -48,7 +48,7 @@ def get_IoU(bbox1, bbox2):
     return intersection_area / union_area
 
 
-def calculate_TP_FP_FN(predictions, label_path, IoU_threshold=0.5):
+def calculate_TP_FP_FN_from_label_path(predictions, label_path, IoU_threshold=0.5):
     #predictions should be ordered by their confidence level
     #predictions should be a list where its elements are in xyxy format lists
     #label_path should be a txt file in YOLO format
@@ -90,19 +90,78 @@ def calculate_TP_FP_FN(predictions, label_path, IoU_threshold=0.5):
     return TP, FP, FN
 
 
-def calculate_TP_FP_FN_all_images(all_predictions, label_paths, IoU_threshold=0.4):
+def calculate_TP_FP_FN(predictions, label_bboxes, IoU_threshold=0.5):
+    #predictions should be ordered by their confidence level
+    #predictions should be a list where its elements are in xyxy format lists
+    #label_bboxes should be a list where its elements are in xyxy format lists
+    #returns TP, FP, FN counts for the given predictions and label_path
+
+    TP, FP, FN = 0, 0, 0
+
+
+    for prediction in predictions:
+        assert(len(prediction) == 4); "Prediction should be in xyxy format"
+        assert(prediction[0] < prediction[2]); "x1 should be smaller than x2"
+        assert(prediction[1] < prediction[3]); "y1 should be smaller than y2"
+        
+        max_IoU = -1
+        max_IoU_index = -1
+
+        for current_index, label_bbox in enumerate(label_bboxes):
+            assert(len(label_bbox) == 4); "Label bbox should be in xyxy format"
+            assert(label_bbox[0] < label_bbox[2]); "x1 should be smaller than x2"
+            assert(label_bbox[1] < label_bbox[3]); "y1 should be smaller than y2"
+
+            current_IoU = get_IoU(prediction, label_bbox)
+
+            
+            if(current_IoU > max_IoU):
+                max_IoU = current_IoU
+                max_IoU_index = current_index
+
+        if(max_IoU >= IoU_threshold):
+            TP += 1
+            label_bboxes.pop(max_IoU_index)
+        else:
+            FP += 1
+    
+    FN = len(label_bboxes)
+
+    return TP, FP, FN
+
+
+
+def calculate_TP_FP_FN_all_images_from_label_path(all_predictions, label_paths, IoU_threshold=0.5):
     #all_predictions should be a list of lists where its elements are in xyxy format lists
     #label_paths should be a list of txt files in YOLO format
     #returns TP, FP, FN counts for the given predictions and label_paths
 
     TP, FP, FN = 0, 0, 0
     for prediction, label_path in zip(all_predictions, label_paths):
-        current_TP, current_FP, current_FN = calculate_TP_FP_FN(prediction, label_path, IoU_threshold=IoU_threshold)
+        current_TP, current_FP, current_FN = calculate_TP_FP_FN_from_label_path(prediction, label_path, IoU_threshold=IoU_threshold)
         TP += current_TP
         FP += current_FP
         FN += current_FN
 
     return TP, FP, FN
+
+
+def calculate_TP_FP_FN_all_images(all_predictions, labels, IoU_threshold=0.5):
+    #all_predictions should be a list of lists where its elements are in xyxy format lists
+    #labels should be a list of lists where its elements are in xyxy format lists
+    #returns TP, FP, FN counts for the given predictions and label_paths
+
+    TP, FP, FN = 0, 0, 0
+    for prediction, label in zip(all_predictions, labels):
+        current_TP, current_FP, current_FN = calculate_TP_FP_FN(prediction, list(label), IoU_threshold=IoU_threshold)
+        TP += current_TP
+        FP += current_FP
+        FN += current_FN
+
+    return TP, FP, FN
+
+
+
 
 def calculate_recall_and_precision_from_TP_FP_FN(TP,FP,FN):
     #returns recall and precision
