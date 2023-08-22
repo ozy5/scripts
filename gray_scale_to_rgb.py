@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 
 blue_mapping_start_point = 200
-red_mapping_start_point = 175
+red_mapping_start_point = 100
 
 blue_mapping_slope = (255/(255-blue_mapping_start_point))
 red_mapping_slope = (255/(255-red_mapping_start_point))
