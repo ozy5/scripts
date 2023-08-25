@@ -12,7 +12,8 @@ CONF_THRESHOLD = 0.2
 # IoU_threshold = 0.5
 # IoU_thresholds = [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.63, 0.66, 0.69, 0.72, 0.75, 0.78, 0.81, 0.84, 0.87, 0.9, 0.93, 0.96]
 IoU_thresholds = [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.63, 0.66, 0.69, 0.72, 0.75]
-IoU_thresholds = list(np.linspace(0.1, 0.75, 20))
+IoU_thresholds = list(np.linspace(0.1, 0.70, 21, dtype=np.float64))
+
 # FOR FILTERED:
 #all images path
 FILTERED_IMAGES_PATH = "/home/umut/Desktop/local_try_exp/HIT_UAV_and_NII_CU_dataset_filtered_200_175_hist_eq/test/images"
