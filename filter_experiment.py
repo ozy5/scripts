@@ -9,17 +9,17 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 
-imgs_path = "/home/umut/Desktop/thermal-disaster-dataset/HIT_UAV_and_NII_CU_dataset/test/images"
+imgs_path = "/home/umut/Desktop/TEST_EXPERIMENTS/SELECTED_SELECTED_FOR_FILTER_EXP"
 
 
-DEST_PATH = "/home/umut/Desktop/thermal-disaster-dataset/200_180_filters_HIST_EQ_for_blue_and_red"
+DEST_PATH = "/home/umut/Desktop/TEST_EXPERIMENTS/SELECTED_SELECTED_FOR_FILTER_EXP/FILTER_RESULTS_LAYERS"
 
 os.makedirs(DEST_PATH, exist_ok=True)
 
 clahe = cv2.createCLAHE(clipLimit=2, tileGridSize=(4,4))
 
-blue_mapping_start_point = 200
-red_mapping_start_point = 180
+blue_mapping_start_point = 175
+red_mapping_start_point = 100
 
 blue_mapping_slope = (255/(255-blue_mapping_start_point))
 red_mapping_slope = (255/(255-red_mapping_start_point))
@@ -28,7 +28,9 @@ print(f"blue_mapping_slope: {blue_mapping_slope}, red_mapping_slope: {red_mappin
 
 passed_times = []
 
-for img_name in os.listdir(imgs_path):
+clahe = cv2.createCLAHE(clipLimit=2, tileGridSize=(4,4))
+
+for img_name in sorted(os.listdir(imgs_path)):
     img_path = os.path.join(imgs_path, img_name)
     # img_max = np.max(img)
     # print(f"img_max: {img_max}")
@@ -53,8 +55,8 @@ for img_name in os.listdir(imgs_path):
     start = time.time()
 
 
-    clahe = cv2.createCLAHE(clipLimit=2, tileGridSize=(4,4))
     img_clahe = clahe.apply(img)
+    
 
     # BASIC GLOBAL THRESHOLDING
     blue_layer = (((img_clahe - blue_mapping_start_point)*blue_mapping_slope) * (img_clahe>blue_mapping_start_point)).astype(np.uint8)
@@ -117,15 +119,17 @@ for img_name in os.listdir(imgs_path):
     # cv2.imshow("blue_layer_of_new_img", blue_layer)
 
     # save the layers seperately adding suffixes to the original image name indicating the channel
-    cv2.imwrite(os.path.join(DEST_PATH, img_name + "_1red.png"), red_layer)
-    cv2.imwrite(os.path.join(DEST_PATH, img_name + "_0green.png"), img)
-    cv2.imwrite(os.path.join(DEST_PATH, img_name + "_2blue.png"), blue_layer)
+    cv2.imwrite(os.path.join(DEST_PATH, img_name.split(".")[0] + "_the_1red_channel.png"), red_layer)
+    #cv2.imwrite(os.path.join(DEST_PATH, img_name.split(".")[0] + "_the_green_channel.png"), img)
+    cv2.imwrite(os.path.join(DEST_PATH, img_name.split(".")[0] + "_the_2blue_channel.png"), blue_layer)
+
+    cv2.imwrite(os.path.join(DEST_PATH, img_name.split(".")[0] + "_the_clahe_version.png"), img_clahe)
 
     # save the new image
-    cv2.imwrite(os.path.join(DEST_PATH, img_name + "_3new.png"), new_img)
+    #cv2.imwrite(os.path.join(DEST_PATH, img_name + "_0filtered.png"), new_img)
 
 #print the average inference time
-print(f"average time taken: {np.mean(passed_times)} at inferences")
+print(f"average time taken: {np.mean(passed_times)} at inferences. Standart deviation is: {np.std(passed_times)} over {len(passed_times)} images." )
 
 
 

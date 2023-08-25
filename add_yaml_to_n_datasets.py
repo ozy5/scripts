@@ -11,7 +11,7 @@ for sub_dataset_path in glob.glob(os.path.join(DATASETS_ROOT_PATH, "**", "datase
         yaml_dict["names"] = ["Human"]
         yaml_dict["nc"] = 1
 
-        yaml_dict["train"] = os.path.join("/datasets", dataset_name, "train")
+        yaml_dict["train"] = os.path.join("/datasets", dataset_name,  "train")
         yaml_dict["val"] = os.path.join("/datasets", dataset_name, "val")
         yaml_dict["test"] = os.path.join("/datasets", dataset_name, "test")
 
