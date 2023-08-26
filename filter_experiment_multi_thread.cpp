@@ -28,7 +28,7 @@ void process_image(const String& img_path, const String& output_path, const vect
     LUT(channels[1], LUT_blue, channels[0]);
     LUT(channels[1], LUT_red, channels[2]);
 
-    // merge(channels, img);
+    merge(channels, img);
 
     auto end = chrono::high_resolution_clock::now();
     double taken_time = chrono::duration_cast<chrono::milliseconds>(end - start).count();
